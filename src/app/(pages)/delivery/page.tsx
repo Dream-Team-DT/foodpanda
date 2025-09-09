@@ -9,7 +9,22 @@ import Card from "@/app/_component/UI/Card";
 import CardBox from "@/app/_component/UI/CardBox";
 import SearchBox from "@/app/_component/UI/SearchBox";
 import Sidebar from "../_components/shared/sidebar/Sidebar";
-import { Restaurant } from "@/types";
+// import { Restaurant } from "@/types";
+
+
+interface Restaurant {
+  _id: string; // MongoDB ID
+  name: string;
+  cuisine: string;
+  priceLabel: string;
+  price: number;
+  offer?: string;
+  rating: number;
+  distance: number;
+  deliveryTime: number;
+  isSuper?: boolean;
+  image?: string;
+}
 
 
 
