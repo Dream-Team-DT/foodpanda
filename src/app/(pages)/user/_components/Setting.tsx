@@ -25,9 +25,7 @@ const Setting: React.FC<SettingProps> = ({ user }) => {
 
   const [formData, setFormData] = useState({
     ...user,
-    birthday: user.birthday
-      ? new Date(user.birthday).toISOString().split("T")[0]
-      : "",
+    birthday: user.birthday?.split("T")[0] || "",
   });
 
   useEffect(() => {
@@ -35,10 +33,7 @@ const Setting: React.FC<SettingProps> = ({ user }) => {
       formData.name !== user.name ||
       formData.phone !== user.phone ||
       formData.address !== user.address ||
-      formData.birthday !==
-        (user.birthday
-          ? new Date(user.birthday).toISOString().split("T")[0]
-          : "") ||
+      formData.birthday !== (user.birthday?.split("T")[0] || "") ||
       formData.gender !== user.gender;
     setIsChanged(hasChanges);
   }, [formData, user]);
