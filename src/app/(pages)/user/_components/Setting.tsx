@@ -25,7 +25,9 @@ const Setting: React.FC<SettingProps> = ({ user }) => {
 
   const [formData, setFormData] = useState({
     ...user,
-    birthday: user.birthday?.split("T")[0] || "",
+    birthday: user.birthday
+      ? new Date(user.birthday).toISOString().split("T")[0]
+      : "",
   });
 
   useEffect(() => {
@@ -33,7 +35,10 @@ const Setting: React.FC<SettingProps> = ({ user }) => {
       formData.name !== user.name ||
       formData.phone !== user.phone ||
       formData.address !== user.address ||
-      formData.birthday !== (user.birthday?.split("T")[0] || "") ||
+      formData.birthday !==
+        (user.birthday
+          ? new Date(user.birthday).toISOString().split("T")[0]
+          : "") ||
       formData.gender !== user.gender;
     setIsChanged(hasChanges);
   }, [formData, user]);
@@ -97,7 +102,6 @@ const Setting: React.FC<SettingProps> = ({ user }) => {
       toast.success("Account deleted successfully!");
 
       signOut({ callbackUrl: "/" });
-
     } catch (err) {
       toast.error("Delete failed: " + err);
     }
@@ -202,14 +206,8 @@ const Setting: React.FC<SettingProps> = ({ user }) => {
 
         <form className="space-y-3 my-10 bg-white p-3.5 md:p-6 rounded-2xl shadow-md">
           <p className="font-semibold">Change Password</p>
-          <Input
-            name="password"
-            placeholder="Old password"
-          />
-          <Input
-            name="password"
-            placeholder="New password"
-          />
+          <Input name="password" placeholder="Old password" />
+          <Input name="password" placeholder="New password" />
           <Button type="submit" className="w-full">
             Change password
           </Button>
@@ -234,11 +232,12 @@ const Setting: React.FC<SettingProps> = ({ user }) => {
                 Are you sure you want to delete your account? This action cannot
                 be undone.
               </p>
-              <p className="text-sm">if you want to delele your account Type <span className="font-semibold">`I want to delete`</span> to confirm</p>
-              <Input
-                value={delValue}
-                onChange={handleDelBtnChange}
-              />
+              <p className="text-sm">
+                if you want to delele your account Type{" "}
+                <span className="font-semibold">`I want to delete`</span> to
+                confirm
+              </p>
+              <Input value={delValue} onChange={handleDelBtnChange} />
               <Button
                 disabled={isDisabled}
                 onClick={handleDelete}
