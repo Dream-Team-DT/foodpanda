@@ -28,7 +28,7 @@ const NavbarBottom = () => {
     menuItems.push({
       icon: <Building />,
       label: "My Restaurant",
-      href: "/restaurant-owner",
+      href: "/restaurant",
     });
   }
 

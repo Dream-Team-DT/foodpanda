@@ -1,9 +1,13 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import Login from "@/app/_component/shared/login";
+import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, ChevronDown, User } from "lucide-react";
-
+import { signIn, signOut, useSession } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,96 +26,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
-import { ChangeEvent, FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
-import Login from "@/app/_component/shared/login";
-
-interface SignUpData {
-  name: string;
-  email: string;
-  password: string;
-}
-interface SignUpErrors {
-  name?: string;
-  email?: string;
-  password?: string;
-  general?: string;
-}
+import SignUp from "@/app/_component/shared/signup";
 
 const UserContent = () => {
   const [state, setState] = useState<string>("");
-
-  const router = useRouter();
-
-  const [loading, setLoading] = useState(false); // ✅ loading state
-
-
-
-  // Sign up start
-  const [signup, setSignUp] = useState<SignUpData>({
-    name: "",
-    email: "",
-    password: "",
-  });
-  const [errors, setErrors] = useState<SignUpErrors>({});
-  // const [loading, setLoading] = useState(false);
-  // const [showConfirmMessage, setShowConfirmMessage] = useState(false);
-
-  const validate = () => {
-    const newErrors: SignUpErrors = {};
-    if (!signup.name.trim()) newErrors.name = "Username is required";
-    if (!signup.email.trim()) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(signup.email))
-      newErrors.email = "Email is invalid";
-    if (!signup.password.trim()) newErrors.password = "Password is required";
-    else if (signup.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSignUp({ ...signup, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
-  };
-
-  const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    setLoading(true);
-    try {
-      const res = await fetch(`api/auth/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(signup),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        await signIn("credentials", {
-          redirect: false,
-          email: signup.email,
-          password: signup.password,
-        });
-
-        router.push("/");
-      } else setErrors({ general: data.message });
-    } catch {
-      setErrors({ general: "Network or server error" });
-    } finally {
-      setLoading(false);
-    }
-  };
-  // Sign up end
-
   const { data: session } = useSession();
 
   return (
     <div className="hidden sm:block">
       {!session ? (
-        /* before login */
+        /* Before login */
         <div>
           <Dialog>
             <form>
@@ -179,75 +103,16 @@ const UserContent = () => {
 
                       <span></span>
                     </DialogHeader>
-
-                    <div>
-                      <form
-                        onSubmit={handleSignUp}
-                        className="space-y-4"
-                        noValidate
+                    <SignUp />
+                    <p className="mt-4 text-center text-sm">
+                      Don t have an account?{" "}
+                      <span
+                        onClick={() => setState("login")}
+                        className="text-pink-500 cursor-pointer hover:underline"
                       >
-                        <input
-                          type="text"
-                          name="name"
-                          placeholder="name"
-                          value={signup.name}
-                          onChange={onInputChange}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-gray-500 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        />
-                        {errors.name && (
-                          <p className="text-red-400 text-sm">{errors.name}</p>
-                        )}
-
-                        <input
-                          type="email"
-                          name="email"
-                          placeholder="Email"
-                          value={signup.email}
-                          onChange={onInputChange}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-gray-500 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        />
-                        {errors.email && (
-                          <p className="text-red-400 text-sm">{errors.email}</p>
-                        )}
-
-                        <input
-                          type="password"
-                          name="password"
-                          placeholder="Password"
-                          value={signup.password}
-                          onChange={onInputChange}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-gray-500 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
-                        />
-                        {errors.password && (
-                          <p className="text-red-400 text-sm">
-                            {errors.password}
-                          </p>
-                        )}
-
-                        {errors.general && (
-                          <p className="text-red-400 text-sm">
-                            {errors.general}
-                          </p>
-                        )}
-
-                        <button
-                          type="submit"
-                          disabled={loading}
-                          className="w-full py-3 bg-pink-600 text-white rounded-xl font-semibold"
-                        >
-                          {loading ? "Creating Account..." : "Sign Up"}
-                        </button>
-                        <p className="mt-4 text-center text-sm">
-                          I have an account?{" "}
-                          <span
-                            onClick={() => setState("login")}
-                            className="text-pink-500 cursor-pointer hover:underline"
-                          >
-                            Login
-                          </span>
-                        </p>
-                      </form>
-                    </div>
+                        Log in
+                      </span>
+                    </p>
                   </div>
                 ) : (
                   <div>
@@ -371,9 +236,20 @@ const UserContent = () => {
               <DropdownMenuLabel className="text-lg">
                 My Account
               </DropdownMenuLabel>
-              <DropdownMenuItem className="text-base hover:bg-secondary/15 p-3 px-4 cursor-pointer">
-                Profile
-              </DropdownMenuItem>
+              <Link href="/user">
+                <DropdownMenuItem className="text-base hover:bg-secondary/15 p-3 px-4 cursor-pointer">
+                  Profile
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/create-restaurant">
+                <DropdownMenuItem
+                  className={`text-base hover:bg-secondary/15 p-3 px-4 cursor-pointer ${
+                    session.user?.restaurantId && "hidden"
+                  }`}
+                >
+                  Build Restaurant
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem className="text-base hover:bg-secondary/15 p-3 px-4 cursor-pointer">

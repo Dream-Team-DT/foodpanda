@@ -1,33 +1,52 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Phone, Star } from "lucide-react";
+import { MapPin, Pen, Phone, Star } from "lucide-react";
 import Image from "next/image";
 
 const Settings = () => {
+  const handleLogoChange = () => {};
+  const handleBannerChange = () => {};
   return (
     <div className="space-y-7">
       <section className="overflow-hidden rounded-2xl border">
         <div className="relative h-48 sm:h-64 md:h-72">
-          {/* Banner image (replace bg url or use next/image) */}
           <div
             className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"
             aria-hidden
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
+          <label htmlFor="avatar-upload">
+            <Pen className="absolute bottom-3 right-3 bg-secondary/35 text-primary border border-primary p-[3px] rounded-sm size-6 cursor-pointer" />
+          </label>
+          <input
+            id="avatar-upload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleBannerChange}
+          />
         </div>
         <div className="p-4 sm:p-6 md:p-8 -mt-16 relative">
           <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-            <div
-              id="avatar"
-              className="h-24 w-24 ring-4 ring-background shadow-xl"
-            >
+            <div className="relative h-24 w-24 ring-4 ring-background shadow-xl">
               <Image
                 width={500}
                 height={500}
-                id="AvatarImage"
                 src="https://images.deliveryhero.io/image/fd-bd/campaign-assets/02e77d64-5036-11f0-a83e-0657f0b942b8/desktop_tile_EnigiJ.png"
                 alt="Restaurant Logo"
+              />
+              <label htmlFor="avatar-upload">
+                <Pen className="absolute -bottom-3 -right-3 bg-secondary/35 text-primary border border-primary p-[3px] rounded-sm size-6 cursor-pointer" />
+              </label>
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleLogoChange}
               />
               {/* <AvatarFallback>RM</AvatarFallback> */}
             </div>

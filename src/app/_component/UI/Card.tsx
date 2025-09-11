@@ -43,6 +43,7 @@ const Card = ({ size, overlay, content, className }: CardPropsTypes) => {
           height={500}
           width={500}
           alt="Store/Food Banner"
+          priority
           // placeholder="blur"
           className="size-full group-hover:scale-[103%] transition"
         />

@@ -1,41 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
 import Slider from "@/app/_component/UI/Slider/Slider";
 import Card from "@/app/_component/UI/Card";
 import CardBox from "@/app/_component/UI/CardBox";
 import SearchBox from "@/app/_component/UI/SearchBox";
 import Sidebar from "../_components/shared/sidebar/Sidebar";
-// import { Restaurant } from "@/types";
-
-
-interface Restaurant {
-  _id: string; // MongoDB ID
-  name: string;
-  cuisine: string;
-  priceLabel: string;
-  price: number;
-  offer?: string;
-  rating: number;
-  distance: number;
-  deliveryTime: number;
-  isSuper?: boolean;
-  image?: string;
-}
-
-
+import { IRestaurant } from "@/types";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [restaurants, setRestaurants] = useState<IRestaurant[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const dispatch = useDispatch();
-  const { selectedCuisines, selectedPrices, offers, quickFilter, sortBy } =
-    useSelector((state: RootState) => state.filters);
-  const favourites = useSelector((state: RootState) => state.favourites.items);
 
   useEffect(() => {
     setLoading(true);
@@ -50,32 +26,7 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Filter & Sort
-  const filteredRestaurants = useMemo(() => {
-    let res = [...restaurants];
-    if (selectedCuisines.length)
-      res = res.filter((r) => selectedCuisines.includes(r.cuisine));
-    if (selectedPrices.length)
-      res = res.filter((r) => selectedPrices.includes(r.priceLabel));
-    if (offers.length) res = res.filter((r) => offers.includes(r.offer || ""));
-    quickFilter.forEach((f) => {
-      if (f === "rating4") res = res.filter((r) => r.rating >= 4);
-      if (f === "super") res = res.filter((r) => r.isSuper);
-    });
-    if (sortBy === "fastest")
-      res.sort((a, b) => a.deliveryTime - b.deliveryTime);
-    if (sortBy === "distance") res.sort((a, b) => a.distance - b.distance);
-    if (sortBy === "top") res.sort((a, b) => b.rating - a.rating);
-    return res;
-  }, [
-    restaurants,
-    selectedCuisines,
-    selectedPrices,
-    offers,
-    quickFilter,
-    sortBy,
-  ]);
-
+  
   return (
     <div className="container relative mx-auto xl:grid grid-cols-9 gap-5 2xl:gap-12">
       <div className="hidden xl:block col-span-2">
@@ -143,14 +94,14 @@ export default function Home() {
           <h1 className="text-center text-3xl font-bold">Loading</h1>
         ) : (
           <CardBox categName="All restaurants">
-            {filteredRestaurants.map((restaurant) => (
+            {restaurants.map((restaurant) => (
               <Card
                 key={restaurant._id}
                 content={{
-                  banner: restaurant.image,
-                  title: restaurant.name,
+                  banner: restaurant.banner,
+                  title: restaurant.title,
                   description: "Kabab",
-                  rating: restaurant.rating,
+                  rating: "",
                   ratingPersion: 140,
                   deliveryTime: "25-35",
                   deliveryCharge: "49",

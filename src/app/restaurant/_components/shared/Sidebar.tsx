@@ -15,27 +15,27 @@ const sideItems = [
   {
     icon: <LayoutDashboard className="h-5 w-5" />,
     label: "Dashboard",
-    href: "/restaurant-owner",
+    href: "/restaurant",
   },
   {
     icon: <UtensilsCrossed className="h-5 w-5" />,
     label: "Products",
-    href: "/restaurant-owner/products",
+    href: "/restaurant/products",
   },
   {
     icon: <PlusCircle className="h-5 w-5" />,
     label: "Add Product",
-    href: "/restaurant-owner/add-product",
+    href: "/restaurant/add-product",
   },
   {
     icon: <ShoppingBag className="h-5 w-5" />,
     label: "Orders",
-    href: "/restaurant-owner/orders",
+    href: "/restaurant/orders",
   },
   {
     icon: <Settings className="h-5 w-5" />,
     label: "Settings",
-    href: "/restaurant-owner/settings",
+    href: "/restaurant/settings",
   },
   {
     icon: <LogOut className="h-5 w-5" />,

@@ -1,5 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+
+import { JSX, useEffect, useState } from "react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { IRestaurant } from "@/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   MapPin,
   Phone,
@@ -8,8 +15,6 @@ import {
   Store,
   UtensilsCrossed,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { JSX } from "react";
 
 // ---------- Types ----------
 interface QuickStat {
@@ -34,12 +39,32 @@ const quickStats: QuickStat[] = [
 ];
 
 export default function RestaurantOwnerPage() {
+  const [restaurant, setRestaurant] = useState<IRestaurant | null>(null);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (!session?.user?.restaurantId) return;
+
+    const fetchRestaurant = async () => {
+      const res = await fetch(`/api/restaurants/${session.user?.restaurantId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setRestaurant(data);
+      }
+    };
+
+    fetchRestaurant();
+  }, [session?.user?.restaurantId]);
+
   return (
     <div className="space-y-6">
       <section className="overflow-hidden rounded-2xl border">
         <div className="relative h-48 sm:h-64 md:h-72">
           {/* Banner image (replace bg url or use next/image) */}
           <div
+            style={{
+              backgroundImage: `url(${restaurant?.banner || ""})`,
+            }}
             className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"
             aria-hidden
           />
@@ -47,37 +72,44 @@ export default function RestaurantOwnerPage() {
         </div>
         <div className="p-4 sm:p-6 md:p-8 -mt-16 relative">
           <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-            <div
-              id="avatar"
-              className="h-24 w-24 ring-4 ring-background shadow-xl"
-            >
+            <div className="h-24 w-24 ring-4 ring-background shadow-xl">
               <Image
-                width={500}
-                height={500}
+                width={300}
+                height={300}
                 id="AvatarImage"
-                src="https://images.deliveryhero.io/image/fd-bd/campaign-assets/02e77d64-5036-11f0-a83e-0657f0b942b8/desktop_tile_EnigiJ.png"
+                src={restaurant?.logo || "/pandaface.svg"}
                 alt="Restaurant Logo"
               />
-              {/* <AvatarFallback>RM</AvatarFallback> */}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-2xl sm:text-3xl font-bold">
-                  RannaBari Restaurant
+                  {restaurant?.title}
                 </h1>
-                <div id="Badge" className="rounded-full">
-                  Verified
-                </div>
+                <Badge
+                  className={`rounded-full text-[11px] ${
+                    restaurant?.isVerified
+                      ? "text-green-600 bg-green-500/25"
+                      : "text-destructive bg-destructive/25"
+                  }`}
+                >
+                  {
+                    restaurant?.isVerified
+                      ? "Verified"
+                      : "unauthorized"
+                  }
+                  {/* Verified */}
+                </Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                {'"'}Fresh • Fast • Halal{'"'} — Dhaka`s favorite comfort foods.
+                {restaurant?.slogan} — Dhaka`s favorite comfort foods.
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                 <span className="inline-flex items-center gap-1">
-                  <MapPin className="h-4 w-4" /> Mirpur, Dhaka
+                  <MapPin className="h-4 w-4" /> {restaurant?.address}
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <Phone className="h-4 w-4" /> 01312-000000
+                  <Phone className="h-4 w-4" /> {restaurant?.phone}
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <Star className="h-4 w-4" /> 4.7 (1.9k)

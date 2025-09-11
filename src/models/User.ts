@@ -1,24 +1,34 @@
-import mongoose, { Model } from "mongoose";
 import { IUser } from "@/types";
+import mongoose, { Schema, model } from "mongoose";
 
-const UserSchema = new mongoose.Schema<IUser>(
+const userSchema = new Schema<IUser>(
   {
-    name: { type: String, required: true },
-    email: { type: String, require: true, unique: true },
-    image: { type: String },
+    name: { type: String, required: true, trim: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    phone: { type: String, unique: true, trim: true },
     password: { type: String },
-    address: { type: String },
-    phone: { type: String },
+    avatar: { type: String, default: "" },
+    address: { type: String, trim: true },
+    gender: { type: String, enum: ["Male", "Female", "Other"] },
+    birthday: { type: Date},
     role: {
       type: String,
       enum: ["customer", "restaurant_owner", "admin"],
       default: "customer",
     },
+    restaurantId: { type: mongoose.Schema.Types.ObjectId, ref: "Restaurant" },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-const User: Model<IUser> =
-  mongoose.models.User || mongoose.model("User", UserSchema);
-//creating User collection
+const User = mongoose.models.User || model<IUser>("User", userSchema);
+
 export default User;

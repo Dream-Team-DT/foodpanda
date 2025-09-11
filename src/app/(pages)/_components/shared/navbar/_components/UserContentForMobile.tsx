@@ -1,7 +1,13 @@
 "use client";
 
+import Image from "next/image";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, User, X } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import Logo from "@/components/ui/Logo";
 import {
   Drawer,
   DrawerClose,
@@ -12,8 +18,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import Logo from "@/components/ui/Logo";
 import {
   Select,
   SelectContent,
@@ -21,17 +25,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { User, X } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
-import Image from "next/image";
+import Login from "@/app/_component/shared/login";
+import SignUp from "@/app/_component/shared/signup";
+import Link from "next/link";
 
 const UserContentForMobile = () => {
   const { data: session } = useSession();
+  const [state, setState] = useState<string>("");
 
   return (
     <div className="sm:hidden ">
       {session ? (
+        // After login
         <div>
           {/* checkbox */}
           <input type="checkbox" id="menuToggle" className="hidden peer" />
@@ -64,9 +69,11 @@ const UserContentForMobile = () => {
             </div>
 
             <ul className="p-3">
-              <li className="py-1.5 px-2.5 hover:bg-accent rounded-sm">
-                Profile
-              </li>
+              <Link href="/user">
+                <li className="py-1.5 px-2.5 hover:bg-accent rounded-sm">
+                  Profile
+                </li>
+              </Link>
               <DropdownMenuSeparator />
               <li className="py-1.5 px-2.5 hover:bg-accent rounded-sm">
                 Pandapay
@@ -107,6 +114,7 @@ const UserContentForMobile = () => {
           </div>
         </div>
       ) : (
+        // Before login
         <Drawer>
           <DrawerTrigger asChild>
             <User className="bg-accent p-1.5 size-10 rounded-full" />
@@ -114,92 +122,156 @@ const UserContentForMobile = () => {
 
           <DrawerContent>
             <div className="mx-auto w-full max-w-sm">
-              <DrawerHeader className="flex">
-                <DrawerTitle>Welcome!</DrawerTitle>
-                <DrawerDescription>
-                  Sign up or log in to continue
-                </DrawerDescription>
+              {state === "login" ? (
+                <div className="px-3">
+                  <DrawerHeader className="mb-5 flex justify-between flex-row">
+                    <ArrowLeft onClick={() => setState("")} />
 
-                <DrawerClose asChild className="absolute right-4 top-4">
-                  <Button
-                    variant="outline"
-                    className="rounded-full size-9 shadow-md"
-                  >
-                    <X />
-                  </Button>
-                </DrawerClose>
-              </DrawerHeader>
+                    <div>
+                      <DrawerTitle className="text-3xl font-bold text-center">
+                        Login
+                      </DrawerTitle>
+                      <DrawerDescription className="font-semibold text-center">
+                        Log in to continue
+                      </DrawerDescription>
+                    </div>
 
-              <div className="grid gap-4 px-5">
-                <Button
-                  disabled
-                  size="lg"
-                  variant="outline"
-                  className="cursor-pointer text-[15px] h-11 text-white bg-[#1877F2] grid grid-cols-4"
-                >
-                  <Image
-                    src="/facebook.svg"
-                    width={100}
-                    height={100}
-                    alt="facebook"
-                    className="size-6"
-                  />
-                  Continue with Facebook
-                </Button>
-                <Button
-                  onClick={() => signIn("google")}
-                  size="lg"
-                  variant="outline"
-                  className="cursor-pointer text-[15px] h-11 hover:bg-gray-300/50 grid grid-cols-4"
-                >
-                  <Image
-                    src={"/google.svg"}
-                    width={100}
-                    height={100}
-                    alt="google"
-                    className="size-6"
-                  />
-                  Continue with Google
-                </Button>
-                <Button
-                  disabled
-                  size="lg"
-                  variant="outline"
-                  className="cursor-pointer text-[15px] h-11 text-white bg-[#000000] grid grid-cols-4"
-                >
-                  <Image
-                    src="/apple.svg"
-                    width={100}
-                    height={100}
-                    alt="apple"
-                    className="size-6"
-                  />
-                  Continue with Apple
-                </Button>
-                <Separator className="my-2" />
-                <Button size="lg" className="cursor-pointer text-[15px] h-11 ">
-                  Login
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="cursor-pointer text-[15px] h-11"
-                >
-                  Sign up
-                </Button>
-              </div>
+                    <span></span>
+                  </DrawerHeader>
 
-              <DrawerFooter>
-                <p className="text-sm text-gray-500">
-                  By signing up, you agree to our
-                  <span className="text-secondary">
-                    {" "}
-                    Terms and Conditions
-                  </span>{" "}
-                  and
-                  <span className="text-secondary"> Privacy Policy.</span>
-                </p>
-              </DrawerFooter>
+                  <div>
+                    <Login />
+                    <p className="mt-4 text-center text-sm">
+                      Don t have an account?{" "}
+                      <span
+                        onClick={() => setState("signup")}
+                        className="text-pink-500 cursor-pointer hover:underline"
+                      >
+                        Sign Up
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              ) : state === "signup" ? (
+                <div className="px-3">
+                  <DrawerHeader className="mb-5 flex justify-between flex-row">
+                    <ArrowLeft onClick={() => setState("")} />
+
+                    <div>
+                      <DrawerTitle className="text-3xl font-bold text-center">
+                        Sign up
+                      </DrawerTitle>
+                      <DrawerDescription className="font-semibold text-center">
+                        Sign up to continue
+                      </DrawerDescription>
+                    </div>
+
+                    <span></span>
+                  </DrawerHeader>
+                  <SignUp />
+                  <p className="my-4 text-center text-sm">
+                    Don t have an account?{" "}
+                    <span
+                      onClick={() => setState("login")}
+                      className="text-pink-500 cursor-pointer hover:underline"
+                    >
+                      Log in
+                    </span>
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <DrawerHeader className="flex">
+                    <DrawerTitle>Welcome!</DrawerTitle>
+                    <DrawerDescription>
+                      Sign up or log in to continue
+                    </DrawerDescription>
+
+                    <DrawerClose asChild className="absolute right-4 top-4">
+                      <Button
+                        variant="outline"
+                        className="rounded-full size-9 shadow-md"
+                      >
+                        <X />
+                      </Button>
+                    </DrawerClose>
+                  </DrawerHeader>
+                  <div className="grid gap-4 px-5">
+                    <Button
+                      disabled
+                      size="lg"
+                      variant="outline"
+                      className="cursor-pointer text-[15px] h-11 text-white bg-[#1877F2] grid grid-cols-4"
+                    >
+                      <Image
+                        src="/facebook.svg"
+                        width={100}
+                        height={100}
+                        alt="facebook"
+                        className="size-6"
+                      />
+                      Continue with Facebook
+                    </Button>
+                    <Button
+                      onClick={() => signIn("google")}
+                      size="lg"
+                      variant="outline"
+                      className="cursor-pointer text-[15px] h-11 hover:bg-gray-300/50 grid grid-cols-4"
+                    >
+                      <Image
+                        src={"/google.svg"}
+                        width={100}
+                        height={100}
+                        alt="google"
+                        className="size-6"
+                      />
+                      Continue with Google
+                    </Button>
+                    <Button
+                      disabled
+                      size="lg"
+                      variant="outline"
+                      className="cursor-pointer text-[15px] h-11 text-white bg-[#000000] grid grid-cols-4"
+                    >
+                      <Image
+                        src="/apple.svg"
+                        width={100}
+                        height={100}
+                        alt="apple"
+                        className="size-6"
+                      />
+                      Continue with Apple
+                    </Button>
+                    <Separator className="my-2" />
+                    <Button
+                      onClick={() => setState("login")}
+                      size="lg"
+                      className="cursor-pointer text-[15px] h-11 "
+                    >
+                      Login
+                    </Button>
+                    <Button
+                      onClick={() => setState("signup")}
+                      size="lg"
+                      variant="outline"
+                      className="cursor-pointer text-[15px] h-11"
+                    >
+                      Sign up
+                    </Button>
+                  </div>
+                  <DrawerFooter>
+                    <p className="text-xs text-gray-500">
+                      By signing up, you agree to our
+                      <span className="text-secondary">
+                        {" "}
+                        Terms and Conditions
+                      </span>{" "}
+                      and
+                      <span className="text-secondary"> Privacy Policy.</span>
+                    </p>
+                  </DrawerFooter>
+                </div>
+              )}
             </div>
           </DrawerContent>
         </Drawer>

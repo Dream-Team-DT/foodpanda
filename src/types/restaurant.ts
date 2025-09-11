@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Types } from "mongoose";
 
 export type OfferType = "Free_delivery" | "Accepts_voucher" | "Deals";
 export type CuisineType = "Asian" | "Bakery" | "Bangladeshi" | "Beverage" | "Fish" | "Other";
@@ -8,11 +8,16 @@ export interface IRestaurant {
   title: string;
   slogan?: string;
   banner?: string;
+  logo?: string;
+  phone:string;
   priceLabel?: string;
   address: string;
+  postcode?: string;
+  country?: string;
   isOpen: boolean;
   offer?: OfferType;
   isSuper?: boolean;
+  isVerified: boolean;
   cuisines?: CuisineType[];
-  ownerId: { type: Schema.Types.ObjectId, ref: "User", required: true }; // reference to User
+  ownerId: Types.ObjectId | string; // reference to User
 }

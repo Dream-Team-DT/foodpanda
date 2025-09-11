@@ -8,10 +8,11 @@ import CredentialsProvider from "next-auth/providers/credentials";
 declare module "next-auth" {
   interface Session {
     user?: {
-      id?: string;
-      role?: string;
+      id: string;
+      role: string;
       address?: string;
       phone?: string;
+      restaurantId?: string;
     } & DefaultSession["user"];
   }
 }
@@ -62,7 +63,7 @@ export const authOptions: NextAuthOptions = {
           id: (user._id as { toString: () => string }).toString(),
           name: user.name,
           email: user.email,
-          image: user.image,
+          image: user.avatar,
           role: user.role,
           address: user.address,
           phone: user.phone,
@@ -91,11 +92,16 @@ export const authOptions: NextAuthOptions = {
     async session({ session }) {
       await connectDB();
       const dbUser = await User.findOne({ email: session.user?.email });
+
       if (dbUser && session.user) {
         session.user.id = (dbUser._id as { toString: () => string }).toString();
-        session.user.role = dbUser.role;
+        session.user.name = dbUser.name;
+        session.user.email = dbUser.email;
         session.user.address = dbUser.address;
+        session.user.image = dbUser.avatar ? dbUser.avatar : session.user.image;
         session.user.phone = dbUser.phone;
+        session.user.role = dbUser.role;
+        session.user.restaurantId = dbUser.restaurantId?.toString() || null;
       }
       return session;
     },

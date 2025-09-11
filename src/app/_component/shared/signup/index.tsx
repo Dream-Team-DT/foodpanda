@@ -1,5 +1,7 @@
 "use client";
 
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState, ChangeEvent, FormEvent } from "react";
 
 interface SignUpData {
@@ -15,6 +17,7 @@ interface SignUpErrors {
 }
 
 export default function SignUp() {
+  const router = useRouter();
   const [signup, setSignUp] = useState<SignUpData>({
     name: "",
     email: "",
@@ -22,7 +25,6 @@ export default function SignUp() {
   });
   const [errors, setErrors] = useState<SignUpErrors>({});
   const [loading, setLoading] = useState(false);
-  const [showConfirmMessage, setShowConfirmMessage] = useState(false);
 
   const validate = () => {
     const newErrors: SignUpErrors = {};
@@ -54,36 +56,21 @@ export default function SignUp() {
         body: JSON.stringify(signup),
       });
       const data = await res.json();
-      if (res.ok) setShowConfirmMessage(true);
-      else setErrors({ general: data.message });
+      if (res.ok) {
+        await signIn("credentials", {
+          redirect: false,
+          email: signup.email,
+          password: signup.password,
+        });
+
+        router.push("/");
+      } else setErrors({ general: data.message });
     } catch {
       setErrors({ general: "Network or server error" });
     } finally {
       setLoading(false);
     }
   };
-
-  if (showConfirmMessage) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-gray-900 to-gray-800 px-4">
-        <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md text-center border border-white/10">
-          <h2 className="text-2xl font-bold text-green-500 mb-4">
-            Registration Successful!
-          </h2>
-          <p className="text-white/80 mb-6">
-            Please check your email and{" "}
-            <span className="text-pink-500 italic">
-              confirm your registration
-            </span>
-            .
-          </p>
-          <button className="w-full py-3 bg-pink-600 text-white rounded-xl font-semibold">
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSignUp} className="space-y-4" noValidate>
