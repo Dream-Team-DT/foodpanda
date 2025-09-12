@@ -74,6 +74,15 @@ const UserContentForMobile = () => {
                   Profile
                 </li>
               </Link>
+              <Link href="/create-restaurant">
+                <li
+                  className={`py-1.5 px-2.5 hover:bg-accent rounded-sm ${
+                    session.user?.restaurantId && "hidden"
+                  }`}
+                >
+                  Build Restaurant
+                </li>
+              </Link>
               <DropdownMenuSeparator />
               <li className="py-1.5 px-2.5 hover:bg-accent rounded-sm">
                 Pandapay

@@ -94,7 +94,7 @@ const Products = () => {
 
               <Popover>
                 <PopoverTrigger className="absolute text-white top-3 right-3 cursor-pointer">
-                  <EllipsisVertical />
+                  <EllipsisVertical className="p-1.5 size-9 bg-black/25 rounded-full"/>
                 </PopoverTrigger>
                 <PopoverContent className="p-2 bg-neutral-800 text-accent border-0">
                   <ul className="space-y-1">
