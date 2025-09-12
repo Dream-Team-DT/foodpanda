@@ -3,6 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import User from "@/models/User";
 import connectDB from "@/lib/dbConnect";
 import { IUser } from "@/types";
+import Restaurant from "@/models/Restaurants";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -95,11 +96,18 @@ export async function DELETE(
 ) {
   await connectDB();
   const { id } = await context.params;
-  const user = await User.findByIdAndDelete(id);
+
+  const user = await User.findById(id);
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
+
+  if (user.role === "restaurant_owner" && user.restaurantId) {
+    await Restaurant.findByIdAndDelete(user.restaurantId);
+  }
+
+  await User.findByIdAndDelete(id);
 
   return NextResponse.json(
     { message: "User deleted successfully" },
