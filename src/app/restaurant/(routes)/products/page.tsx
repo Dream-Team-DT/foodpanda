@@ -1,7 +1,7 @@
 "use client";
 
 import { IProduct } from "@/types";
-import { EllipsisVertical, Pencil, Trash2 } from "lucide-react";
+import { EllipsisVertical, Loader, Pencil, Trash2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 
 const Products = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [products, setProducts] = useState<IProduct[]>([]);
   const { data: session } = useSession();
 
@@ -38,7 +39,28 @@ const Products = () => {
     fetchProducts();
   }, [session?.user?.restaurantId]);
 
-  console.log(products);
+  const handleAvilable = async (_id: string, checked: boolean) => {
+    setLoading(true);
+
+    try {
+      const res = await fetch(`/api/products/${_id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isAvailable: checked }),
+      });
+
+      if (res.ok) {
+        setLoading(false);
+        setProducts((prev) =>
+          prev.map((p) => (p._id === _id ? { ...p, isAvailable: checked } : p))
+        );
+      } else {
+        console.error("Failed to update availability");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
 
   return (
     <div>
@@ -95,7 +117,16 @@ const Products = () => {
                     </li>
                     <li className="p-2 hover:bg-accent/10 rounded border-b border-gray-50/30 cursor-pointer flex justify-between items-center">
                       <p>is Available</p>
-                      <Switch checked={isAvailable} />
+                      {loading ? (
+                        <Loader className="animate-spin text-secondary" />
+                      ) : (
+                        <Switch
+                          checked={isAvailable}
+                          onCheckedChange={(checked) =>
+                            handleAvilable(_id, checked)
+                          }
+                        />
+                      )}
                     </li>
                     <li className="p-2 rounded border-b border-gray-50/30 cursor-pointer bg-destructive/25 hover:bg-destructive/30 text-destructive">
                       <Dialog>

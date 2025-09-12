@@ -19,3 +19,25 @@ export async function GET(
 
   return NextResponse.json(products);
 }
+
+export async function PATCH(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  await connectDB();
+
+  const body = await req.json();
+  const { id } = await context.params;
+
+  const updatedProduct = await Product.findByIdAndUpdate(
+    id,
+    { isAvailable: body.isAvailable },
+    { new: true }
+  );
+
+  if (!updatedProduct) {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(updatedProduct, { status: 200 });
+}
