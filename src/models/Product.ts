@@ -7,7 +7,8 @@ const ProductSchema = new Schema<IProduct>(
     description: { type: String },
     image: { type: String, required: true },
     price: { type: Number, required: true },
-    type: { type: String },
+    category: { type: String },
+    isAvailable: { type: Boolean, default: true },
     restaurantId: {
       type: Schema.Types.ObjectId,
       ref: "Restaurant",

@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Types } from "mongoose";
 
 export interface IProduct {
   _id?: string;
@@ -6,6 +6,7 @@ export interface IProduct {
   description?: string;
   image: string;
   price: number;
-  type?: string;
-  restaurantId: { type: Schema.Types.ObjectId, ref: "Restaurant", required: true }; // reference to Restaurant
+  category?: string;
+  isAvailable: boolean;
+  restaurantId: Types.ObjectId | string; // reference to Restaurant
 }
