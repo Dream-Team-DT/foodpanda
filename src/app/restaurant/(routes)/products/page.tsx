@@ -1,30 +1,43 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { IProduct } from "@/types";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 const Products = () => {
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (!session?.user?.restaurantId) return;
+
+    const fetchProducts = async () => {
+      const res = await fetch(`/api/products/${session.user?.restaurantId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data);
+      }
+    };
+
+    fetchProducts();
+  }, [session?.user?.restaurantId]);
+
   return (
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Card key={i} className="rounded-2xl overflow-hidden">
-            <div className="h-32 bg-[url('https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200&auto=format&fit=crop')] bg-cover bg-center" />
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-medium">Chicken Bowl {i}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Rice, chicken, salad
-                  </p>
-                  <p className="mt-2 font-semibold">৳220</p>
-                </div>
-                <div className="space-x-2">
-                  <Button size="sm" variant="outline" className="rounded-xl">
-                    Edit
-                  </Button>
-                  <Button size="sm" variant="outline" className="rounded-xl">
-                    Hide
-                  </Button>
-                </div>
+        {products.map(({ _id, name, description, image, price }) => (
+          <Card key={_id} className="rounded-2xl gap-0 overflow-hidden p-0">
+            <div
+              style={{ backgroundImage: `url(${image})` }}
+              className="h-50 bg-cover bg-center bg-amber-300"
+            />
+            <CardContent className="p-4 border-t">
+              <div>
+                <p className="font-medium">{name}</p>
+                <p className="text-xs text-muted-foreground">{description}</p>
+                <p className="mt-2 font-semibold">৳ {price}</p>
               </div>
             </CardContent>
           </Card>
