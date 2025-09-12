@@ -69,13 +69,13 @@ const Products = () => {
           ({ _id, name, description, image, price, isAvailable }) => (
             <Card
               key={_id}
-              className={`relative rounded-2xl w-[23rem] gap-0 overflow-hidden p-0 ${
+              className={`relative rounded-2xl md:w-[20rem] 2xl:w-[23rem] gap-0 overflow-hidden p-0 ${
                 !isAvailable && "order-last"
               }`}
             >
               <div
                 style={{ backgroundImage: `url(${image})` }}
-                className="h-46 bg-cover bg-center"
+                className="h-34 md:h-46 bg-cover bg-center"
               />
               <CardContent className="px-4 py-2 border-t">
                 <div>
