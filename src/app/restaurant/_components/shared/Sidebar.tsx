@@ -52,7 +52,7 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`relative p-4 md:p-6 bg-white  border border-fp-gray size-full rounded-2xl transition ${
+      className={`relative p-4 md:p-6 bg-white  border border-fp-gray size-full rounded-2xl transition xl:translate-0 ${
         open ? "translate-x-0" : "-translate-x-full"
       }`}
     >
