@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   LayoutDashboard,
   LogOut,
   PlusCircle,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const sideItems = [
   {
@@ -45,10 +47,21 @@ const sideItems = [
 ];
 
 const Sidebar = () => {
+  const [open, setOpen] = useState<boolean>(false);
   const pathname = usePathname(); // current route
 
   return (
-    <aside className="p-4 md:p-6">
+    <aside
+      className={`relative p-4 md:p-6 bg-white  border border-fp-gray size-full rounded-2xl transition ${
+        open ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
+      <ArrowLeft
+        className={`absolute xl:hidden top-0 right-0 translate-1/2 p-1 bg-secondary rounded-full size-7 ${
+          open ? "rotate-0" : "rotate-180 translate-x-10"
+        }`}
+        onClick={() => setOpen(!open)}
+      />
       <div className="mb-6">
         <h2 className="text-lg font-semibold tracking-tight">Owner Panel</h2>
         <p className="text-xs text-muted-foreground">Manage your restaurant</p>
