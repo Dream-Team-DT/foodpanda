@@ -26,18 +26,47 @@ export async function PATCH(
 ) {
   await connectDB();
 
-  const body = await req.json();
+  try {
+    const body = await req.json();
+    const { id } = await context.params;
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, body, {
+      // isAvailable: body.isAvailable,
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedProduct) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, product: updatedProduct });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Error updating product:" + (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
+
+// Delete Product
+export async function DELETE(
+  req: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  await connectDB();
   const { id } = await context.params;
 
-  const updatedProduct = await Product.findByIdAndUpdate(
-    id,
-    { isAvailable: body.isAvailable },
-    { new: true }
-  );
+  const product = await Product.findById(id);
 
-  if (!updatedProduct) {
+  if (!product) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
-  return NextResponse.json(updatedProduct, { status: 200 });
+  await Product.findByIdAndDelete(id);
+
+  return NextResponse.json(
+    { message: "Product deleted successfully" },
+    { status: 200 }
+  );
 }

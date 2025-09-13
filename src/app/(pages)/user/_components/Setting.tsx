@@ -1,5 +1,11 @@
+import { useEffect, useState } from "react";
+import { signOut, useSession } from "next-auth/react";
+import { IUser } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -7,13 +13,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Toaster } from "@/components/ui/sonner";
-import { Textarea } from "@/components/ui/textarea";
-import { IUser } from "@/types";
-import { signOut, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 interface SettingProps {
   user: IUser;
@@ -196,7 +195,6 @@ const Setting: React.FC<SettingProps> = ({ user }) => {
           >
             Save Changes
           </Button>
-          <Toaster position="top-center" richColors />
         </form>
 
         <form className="space-y-3 my-10 bg-white p-3.5 md:p-6 rounded-2xl shadow-md">
