@@ -57,7 +57,7 @@ const Sidebar = () => {
       }`}
     >
       <ArrowLeft
-        className={`absolute xl:hidden top-0 right-0 translate-1/2 p-1 bg-secondary rounded-full size-7 ${
+        className={`absolute xl:hidden top-0 right-0 translate-1/2 p-1.5 bg-secondary/70 rounded-full size-8 ${
           open ? "rotate-0" : "rotate-180 translate-x-10"
         }`}
         onClick={() => setOpen(!open)}
