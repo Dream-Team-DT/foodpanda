@@ -207,7 +207,7 @@ const UserContentForMobile = () => {
                   </DrawerHeader>
                   <div className="grid gap-4 px-5">
                     <Button
-                      disabled
+                      onClick={() => signIn("facebook")}
                       size="lg"
                       variant="outline"
                       className="cursor-pointer text-[15px] h-11 text-white bg-[#1877F2] grid grid-cols-4"

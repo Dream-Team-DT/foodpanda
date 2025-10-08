@@ -1,105 +1,209 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Pen, Phone, Star } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
+import { IRestaurant } from "@/types";
+import { useSession } from "next-auth/react";
 
 const Settings = () => {
-  const handleLogoChange = () => {};
-  const handleBannerChange = () => {};
+  const [restaurant, setRestaurant] = useState<IRestaurant | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { data: session } = useSession();
+
+  // formData আলাদা state
+  const [formData, setFormData] = useState({
+    title: "",
+    slogan: "",
+    phone: "",
+    address: "",
+    banner: "",
+    logo: "",
+  });
+
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+
+  // fetch restaurant
+  useEffect(() => {
+    const fetchRestaurant = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `/api/restaurants/${session?.user?.restaurantId}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch restaurant");
+        const data = await res.json();
+        setRestaurant(data);
+      } catch (error) {
+        console.error("Fetch Error:", error);
+        toast.error("Failed to load restaurant data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (session?.user?.restaurantId) {
+      fetchRestaurant();
+    }
+  }, [session?.user?.restaurantId]);
+
+  // যখন restaurant আসবে, formData update করো
+  useEffect(() => {
+    if (restaurant) {
+      setFormData({
+        title: restaurant.title || "",
+        slogan: restaurant.slogan || "",
+        phone: restaurant.phone || "",
+        address: restaurant.address || "",
+        banner: restaurant.banner || "",
+        logo: restaurant.logo || "",
+      });
+    }
+  }, [restaurant]);
+
+  // file handle
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      setLogoFile(e.target.files[0]);
+    }
+  };
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      setBannerFile(e.target.files[0]);
+    }
+  };
+
+  // input handle
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // update
+  const handleUpdate = async () => {
+    try {
+      setLoading(true);
+
+      let bannerUrl = formData.banner;
+      let logoUrl = formData.logo;
+
+      // upload banner
+      if (bannerFile) {
+        const data = new FormData();
+        data.append("file", bannerFile);
+        const res = await fetch("/api/cloudinaryUpload", {
+          method: "POST",
+          body: data,
+        });
+        const upload = await res.json();
+        bannerUrl = upload.secure_url;
+      }
+
+      // upload logo
+      if (logoFile) {
+        const data = new FormData();
+        data.append("file", logoFile);
+        const res = await fetch("/api/cloudinaryUpload", {
+          method: "POST",
+          body: data,
+        });
+        const upload = await res.json();
+        logoUrl = upload.secure_url;
+      }
+
+      const res = await fetch(
+        `/api/restaurants/${session?.user?.restaurantId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formData,
+            banner: bannerUrl,
+            logo: logoUrl,
+          }),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to update restaurant");
+
+      toast.success("Restaurant updated successfully!");
+    } catch (err) {
+      console.error("Update Error:", err);
+      toast.error("Failed to update restaurant!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading && !restaurant) {
+    return <p className="text-center">Loading...</p>;
+  }
+
   return (
-    <div className="space-y-7">
-      <section className="overflow-hidden rounded-2xl border">
+    <form>
+      {/* banner */}
+      <div className="overflow-hidden rounded-2xl border">
         <div className="relative h-48 sm:h-64 md:h-72">
           <div
-            className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"
-            aria-hidden
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${formData.banner})` }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
-          <label htmlFor="avatar-upload">
-            <Pen className="absolute bottom-3 right-3 bg-secondary/35 text-primary border border-primary p-[3px] rounded-sm size-6 cursor-pointer" />
-          </label>
-          <input
-            id="avatar-upload"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleBannerChange}
-          />
         </div>
+
         <div className="p-4 sm:p-6 md:p-8 -mt-16 relative">
-          <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-            <div className="relative h-24 w-24 ring-4 ring-background shadow-xl">
-              <Image
-                width={500}
-                height={500}
-                src="https://images.deliveryhero.io/image/fd-bd/campaign-assets/02e77d64-5036-11f0-a83e-0657f0b942b8/desktop_tile_EnigiJ.png"
-                alt="Restaurant Logo"
-              />
-              <label htmlFor="avatar-upload">
-                <Pen className="absolute -bottom-3 -right-3 bg-secondary/35 text-primary border border-primary p-[3px] rounded-sm size-6 cursor-pointer" />
-              </label>
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleLogoChange}
-              />
-              {/* <AvatarFallback>RM</AvatarFallback> */}
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-2xl sm:text-3xl font-bold">
-                  RannaBari Restaurant
-                </h1>
-                <div id="Badge" className="rounded-full">
-                  Verified
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                {'"'}Fresh • Fast • Halal{'"'} — Dhaka`s favorite comfort foods.
-              </p>
-              <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="h-4 w-4" /> Mirpur, Dhaka
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <Phone className="h-4 w-4" /> 01312-000000
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <Star className="h-4 w-4" /> 4.7 (1.9k)
-                </span>
-              </div>
-            </div>
+          <div className="relative h-24 w-24 ring-4 ring-background shadow-xl">
+            <Image
+              width={500}
+              height={500}
+              src={formData.logo || "/default-logo.png"}
+              alt="Restaurant Logo"
+              className="rounded-md object-cover"
+            />
+            <label htmlFor="logo-upload">
+              <Pen className="absolute -bottom-3 -right-3 bg-secondary/35 text-primary border border-primary p-[3px] rounded-sm size-6 cursor-pointer" />
+            </label>
+            <input
+              id="logo-upload"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleLogoChange}
+            />
           </div>
         </div>
-      </section>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Restaurant Name</label>
-          <Input defaultValue="RannaBari Restaurant" />
-          <label className="text-sm font-medium">Slogan</label>
-          <Input defaultValue="Fresh • Fast • Halal" />
-          <label className="text-sm font-medium">Phone</label>
-          <Input defaultValue="01312-000000" />
+      </div>
+
+      {/* Inputs */}
+      <div className="grid grid-cols-2 gap-5 mt-5">
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="name">Restaurant title</label>
+            <Input type="text" id="name" name="name" defaultValue={""} />
+          </div>
+          <div>
+            <label htmlFor="name">Slogan</label>
+            <Input type="text" id="name" name="name" defaultValue={""} />
+          </div>
+          <div>
+            <label htmlFor="name">Restaurant title</label>
+            <Input type="text" id="name" name="name" defaultValue={""} />
+          </div>
         </div>
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Address</label>
-          <Textarea defaultValue="House 11, Road 4, Mirpur, Dhaka" />
-          <label className="text-sm font-medium">Banner Image URL</label>
-          <Input placeholder="https://..." />
+
+        <div>
+          <label htmlFor="description">Restaurant title</label>
+          <Textarea id="description" name="description" defaultValue={""} />
         </div>
       </div>
-      <div className="mt-4 flex gap-2">
-        <Button className="rounded-xl">Update</Button>
-        <Button variant="outline" className="rounded-xl">
-          Cancel
-        </Button>
-      </div>
-    </div>
+    </form>
   );
 };
 

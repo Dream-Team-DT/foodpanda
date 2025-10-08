@@ -3,6 +3,7 @@ import User from "@/models/User";
 import NextAuth, { DefaultSession, NextAuthOptions } from "next-auth";
 import bcrypt from "bcryptjs";
 import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 declare module "next-auth" {
@@ -31,6 +32,19 @@ export const authOptions: NextAuthOptions = {
         process.env.GOOGLE_SECRET ??
         (() => {
           throw new Error("GOOGLE_SECRET is not defined");
+        })(),
+    }),
+
+    FacebookProvider({
+      clientId:
+        process.env.FACEBOOK_ID ??
+        (() => {
+          throw new Error("FACEBOOK_ID is not defined");
+        })(),
+      clientSecret:
+        process.env.FACEBOOK_SECRET ??
+        (() => {
+          throw new Error("FACEBOOK_SECRET is not defined");
         })(),
     }),
 

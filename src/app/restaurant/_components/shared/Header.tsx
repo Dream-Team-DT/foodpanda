@@ -12,7 +12,7 @@ export default function Header() {
         <UserContentForMobile />
 
         {/* Site Logo */}
-        <Logo />
+        {/* <Logo /> */}
 
         <div className="flex items-center gap-2 md:gap-7">
           <Button variant="ghost" size="icon" className="rounded-full">
